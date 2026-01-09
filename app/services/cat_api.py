@@ -9,7 +9,4 @@ async def is_valid_breed(breed_name: str) -> bool:
         response.raise_for_status()
 
         breeds = response.json()
-        return any(
-            breed["name"].lower() == breed_name.lower()
-            for breed in breeds
-        )
+        return any(breed["name"].lower() == breed_name.lower() for breed in breeds)

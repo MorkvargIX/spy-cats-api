@@ -1,5 +1,6 @@
-from pydantic import BaseModel, field_validator
 from typing import List, Optional
+
+from pydantic import BaseModel, field_validator
 
 from app.schemas.target import TargetCreate, TargetRead
 
@@ -13,6 +14,7 @@ class MissionCreate(BaseModel):
         if not (1 <= len(v) <= 3):
             raise ValueError("Mission must have between 1 and 3 targets")
         return v
+
 
 class MissionAssign(BaseModel):
     cat_id: int

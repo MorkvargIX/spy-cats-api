@@ -1,14 +1,10 @@
-from fastapi import APIRouter, Depends, status, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db_session
 from app.models.spy_cat import SpyCat
-from app.schemas.spy_cat import (
-    SpyCatCreate,
-    SpyCatRead,
-    SpyCatUpdate,
-)
+from app.schemas.spy_cat import SpyCatCreate, SpyCatRead, SpyCatUpdate
 from app.services.cat_api import is_valid_breed
 
 router = APIRouter(
@@ -109,4 +105,3 @@ async def delete_spy_cat(
 
     await db.delete(cat)
     await db.commit()
-

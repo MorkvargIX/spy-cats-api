@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
 from typing import Optional
+
+from pydantic import BaseModel, Field
 
 
 class TargetBase(BaseModel):
@@ -32,4 +33,3 @@ class TargetOut(BaseModel):
     is_completed: bool
 
     model_config = {"from_attributes": True}
-

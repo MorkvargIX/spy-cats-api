@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.db.session import get_db_session
 from app.models.mission import Mission
-from app.models.target import Target
 from app.models.spy_cat import SpyCat
-from app.schemas.mission import MissionCreate, MissionRead, MissionAssign
-from app.schemas.target import TargetUpdate, TargetOut
+from app.models.target import Target
+from app.schemas.mission import MissionAssign, MissionCreate, MissionRead
+from app.schemas.target import TargetOut, TargetUpdate
 
 router = APIRouter(
     prefix="/missions",
@@ -36,11 +36,7 @@ async def create_mission(
     db.add(mission)
     await db.commit()
 
-    result = await db.execute(
-        select(Mission)
-        .options(selectinload(Mission.targets))
-        .where(Mission.id == mission.id)
-    )
+    result = await db.execute(select(Mission).options(selectinload(Mission.targets)).where(Mission.id == mission.id))
     mission = result.scalar_one()
 
     return mission
@@ -72,11 +68,7 @@ async def assign_cat_to_mission(
     mission.cat_id = cat.id
     await db.commit()
 
-    stmt = (
-        select(Mission)
-        .where(Mission.id == mission.id)
-        .options(selectinload(Mission.targets))
-    )
+    stmt = select(Mission).where(Mission.id == mission.id).options(selectinload(Mission.targets))
 
     mission = await db.scalar(stmt)
     return mission
@@ -111,12 +103,7 @@ async def update_target(
     db: AsyncSession = Depends(get_db_session),
 ):
     stmt = (
-        select(Target)
-        .where(Target.id == target_id)
-        .options(
-            selectinload(Target.mission)
-            .selectinload(Mission.targets)
-        )
+        select(Target).where(Target.id == target_id).options(selectinload(Target.mission).selectinload(Mission.targets))
     )
 
     target = (await db.scalars(stmt)).first()
@@ -143,15 +130,11 @@ async def update_target(
     return target
 
 
-
 @router.get("", response_model=list[MissionRead])
 async def list_missions(
     db: AsyncSession = Depends(get_db_session),
 ):
-    stmt = (
-        select(Mission)
-        .options(selectinload(Mission.targets))
-    )
+    stmt = select(Mission).options(selectinload(Mission.targets))
 
     result = await db.scalars(stmt)
     missions = result.all()
@@ -163,11 +146,7 @@ async def get_mission(
     mission_id: int,
     db: AsyncSession = Depends(get_db_session),
 ):
-    stmt = (
-        select(Mission)
-        .where(Mission.id == mission_id)
-        .options(selectinload(Mission.targets))
-    )
+    stmt = select(Mission).where(Mission.id == mission_id).options(selectinload(Mission.targets))
 
     mission = await db.scalar(stmt)
     if not mission:
