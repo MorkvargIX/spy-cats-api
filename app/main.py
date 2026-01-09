@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from app.db.base import Base
 from app.db.engine import engine
 from app.routers import cats
+from app.routers import missions
 
 
 @asynccontextmanager
@@ -26,6 +27,8 @@ app = FastAPI(
 )
 
 app.include_router(cats.router)
+app.include_router(missions.router)
+
 
 @app.get("/health")
 async def health_check():

@@ -9,7 +9,7 @@ from app.schemas.spy_cat import (
     SpyCatRead,
     SpyCatUpdate,
 )
-
+from app.services.cat_api import is_valid_breed
 
 router = APIRouter(
     prefix="/cats",
@@ -26,7 +26,16 @@ async def create_spy_cat(
     payload: SpyCatCreate,
     db: AsyncSession = Depends(get_db_session),
 ):
-    cat = SpyCat(**payload.model_dump())
+    is_valid = await is_valid_breed(payload.breed)
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Invalid cat breed",
+        )
+    cat_data = payload.model_dump()
+    cat_data["breed"] = cat_data["breed"].title()
+
+    cat = SpyCat(**cat_data)
     db.add(cat)
     await db.commit()
     await db.refresh(cat)

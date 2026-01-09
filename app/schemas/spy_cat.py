@@ -19,5 +19,4 @@ class SpyCatRead(SpyCatBase):
     id: int
     salary: float
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
